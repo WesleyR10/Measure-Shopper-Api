@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   app:
@@ -11,7 +11,7 @@ services:
       - db
 
   db:
-    image: bitnami/postgresql 
+    image: bitnami/postgresql:latest
     ports:
       - "5432:5432"
     environment:
@@ -23,3 +23,4 @@ services:
 
 volumes:
   db_data:
+    driver: local

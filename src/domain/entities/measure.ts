@@ -1,5 +1,6 @@
 import { Entity } from "../@shared/entity";
 import { UniqueEntityID } from "../@shared/unique-entity-id";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface MeasureProps {
   customer_code: string;
@@ -14,6 +15,7 @@ export interface MeasureProps {
 export class Measure extends Entity<MeasureProps> {
   constructor(props: MeasureProps, id?: UniqueEntityID) {
     super(props, id);
+    this.props.measure_uuid = props.measure_uuid || uuidv4();
     this.validate();
   }
 
@@ -74,6 +76,6 @@ export class Measure extends Entity<MeasureProps> {
   }
 
   get measure_uuid(): string {
-    return this.id.toValue();
+    return this.props.measure_uuid!;
   }
 }

@@ -10,7 +10,7 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "jest-environment-node",
   modulePathIgnorePatterns: ['dist', 'node_modules', 'coverage'],
-  testMatch: ['**/*.spec.ts'],
+  testMatch: ['**/*.e2e.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
   }

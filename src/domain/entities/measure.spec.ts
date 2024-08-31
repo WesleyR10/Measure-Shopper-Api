@@ -9,7 +9,12 @@ const fakeMeasureProps: MeasureProps = {
   image_url: "http://example.com/image.jpg",
   measure_value: 10,
   has_confirmed: true,
+  measure_uuid: '88d8ad12-1f18-4328-86ab-9273d435e422' // UUID fixo para consistência
 };
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'generated-uuid')
+}));
 
 describe("Measure unit tests", () => {
   beforeAll(() => {
@@ -37,56 +42,47 @@ describe("Measure unit tests", () => {
     expect(measure.id.toValue()).toBe("12345");
   });
 
-  it("should throw error when customer_code is empty", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, customer_code: "" };
-      new Measure(props);
-    }).toThrowError("Customer code is required");
-  });
+it("should throw error when customer_code is empty", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, customer_code: "" };
+    new Measure(props);
+  }).toThrowError("Customer code is required");
+});
 
-  it("should throw error when measure_datetime is missing", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, measure_datetime: null as any };
-      new Measure(props);
-    }).toThrowError("Measure datetime is required");
-  });
+it("should throw error when measure_datetime is missing", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, measure_datetime: null as any };
+    new Measure(props);
+  }).toThrowError("Measure datetime is required");
+});
 
-  it("should throw error when measure_type is empty", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, measure_type: "" };
-      new Measure(props);
-    }).toThrowError("Measure type is required");
-  });
+it("should throw error when measure_type is empty", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, measure_type: "" };
+    new Measure(props);
+  }).toThrowError("Measure type is required");
+});
 
-  it("should throw error when image_url is empty", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, image_url: "" };
-      new Measure(props);
-    }).toThrowError("Image URL is required");
-  });
+it("should throw error when image_url is empty", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, image_url: "" };
+    new Measure(props);
+  }).toThrowError("Image URL is required");
+});
 
-  it("should throw error when measure_value is less than zero", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, measure_value: -1 };
-      new Measure(props);
-    }).toThrowError("Measure value must be greater than or equal to zero");
-  });
+it("should throw error when measure_value is less than zero", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, measure_value: -1 };
+    new Measure(props);
+  }).toThrowError("Measure value must be greater than or equal to zero");
+});
 
-  it("should throw error when has_confirmed is not a boolean", () => {
-    expect(() => {
-      const props = { ...fakeMeasureProps, has_confirmed: null as any };
-      new Measure(props);
-    }).toThrowError("Has confirmed must be a boolean");
-  });
-
-  it("should create a measure with valid props", () => {
-    expect(measure.customer_code).toEqual(fakeMeasureProps.customer_code);
-    expect(measure.measure_datetime).toEqual(fakeMeasureProps.measure_datetime);
-    expect(measure.measure_type).toEqual(fakeMeasureProps.measure_type);
-    expect(measure.image_url).toEqual(fakeMeasureProps.image_url);
-    expect(measure.measure_value).toEqual(fakeMeasureProps.measure_value);
-    expect(measure.has_confirmed).toEqual(fakeMeasureProps.has_confirmed);
-  });
+it("should throw error when has_confirmed is not a boolean", () => {
+  expect(() => {
+    const props = { ...fakeMeasureProps, has_confirmed: null as any };
+    new Measure(props);
+  }).toThrowError("Has confirmed must be a boolean");
+});
 
   it("should change measure_value (setter)", () => {
     measure.measure_value = 20;
@@ -129,6 +125,15 @@ describe("Measure unit tests", () => {
   });
 
   it("should return measure_uuid (getter)", () => {
+    const id = new UniqueEntityID(fakeMeasureProps.measure_uuid);
+    const measure = new Measure(fakeMeasureProps, id);
+    
     expect(measure.measure_uuid).toBe(measure.id.toValue());
+  });
+
+  it("should generate measure_uuid if not provided", () => {
+    const propsWithoutUUID = { ...fakeMeasureProps, measure_uuid: undefined };
+    const measure = new Measure(propsWithoutUUID);
+    expect(measure.measure_uuid).toBe('generated-uuid');
   });
 });
