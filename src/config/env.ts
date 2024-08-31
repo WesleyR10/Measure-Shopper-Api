@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const envSchema = z.object({
   PORT: z.coerce.number().optional().default(3000),
-  SONAR_TOKEN: z.string().nonempty({ message: "SONAR_TOKEN é obrigatório" }),
-  DOCKERHUB_TOKEN: z.string().nonempty({ message: "DOCKERHUB_TOKEN é obrigatório" }),
+  SONAR_TOKEN: z.string().optional(),
+  DOCKERHUB_TOKEN: z.string().optional(),
   DATABASE_URL: z.string().url({ message: "DATABASE_URL inválida" }),
   GEMINI_API_KEY: z.string().nonempty({ message: "GEMINI_API_KEY é obrigatório" }),
 });
