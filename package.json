@@ -1,0 +1,49 @@
+{
+  "name": "shopper-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "tsx watch src/server.ts",
+    "start": "node build/server.js",
+    "tsc": "tsc",
+    "build": "tsup src --out-dir build",
+    "test": "npm run tsc -- --noEmit && jest",
+    "test:watch": "npm run tsc -- --noEmit && jest --watch",
+    "test:cov": "npm run tsc -- --noEmit && jest --coverage",
+    "test:e2e": "npm run tsc -- --noEmit && jest --config jest.e2e.config.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "^1.7.21",
+    "@swc/jest": "^0.2.36",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.5.1",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^3.0.7",
+    "mockdate": "^3.0.5",
+    "prisma": "^5.19.0",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@fastify/helmet": "^11.1.1",
+    "@fastify/rate-limit": "^9.1.0",
+    "@fastify/static": "^7.0.4",
+    "@google/generative-ai": "^0.17.1",
+    "@prisma/client": "^5.19.0",
+    "axios": "^1.7.5",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.28.1",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  }
+}
