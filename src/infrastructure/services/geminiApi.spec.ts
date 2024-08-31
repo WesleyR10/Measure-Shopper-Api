@@ -9,11 +9,9 @@ describe('GeminiApi', () => {
   const imageBase64 = fs.readFileSync(imagePath).toString("base64");
 
   it('should analyze the image and return the result', async () => {
-    console.log("imagePath", imagePath);
 
     try {
       const result = await geminiApi.analyzeImage(imageBase64, 'WATER');
-      console.log("Resultado da análise da imagem:", result);
       expect(result).toBeDefined();
     } catch (error) {
       console.error("Erro ao analisar a imagem:", error);

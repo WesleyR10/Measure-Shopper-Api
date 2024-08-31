@@ -20,17 +20,14 @@ export class UploadUseCase {
 
     // Verificar se já existe uma leitura no mês
     const existingMeasures = await this.measureRepository.findByCustomerCodeAndType(customer_code, measure_type);
-    console.log("Use Case: Medidas existentes encontradas:", existingMeasures);
     
     const existingMeasure = existingMeasures.find(measure => {
       const measureDate = new Date(measure.measure_datetime);
-      console.log(`Comparando datas: ${measureDate} e ${measure_datetime}`);
       return measureDate.getMonth() === measure_datetime.getMonth() &&
-             measureDate.getFullYear() === measure_datetime.getFullYear();
+      measureDate.getFullYear() === measure_datetime.getFullYear();
     });
 
     if (existingMeasure) {
-      console.log("Use Case: Leitura do mês já realizada");
       throw {
         statusCode: 409,
         code: 'DOUBLE_REPORT',
@@ -41,7 +38,6 @@ export class UploadUseCase {
     try {
       // Integrar com a API do Google Gemini
       const geminiResponse = await this.geminiApi.analyzeImage(image, measure_type);
-      console.log("Use Case: Resposta da API Gemini:", geminiResponse);
 
       // Criar a entidade Measure
       const measure = new Measure({
@@ -56,7 +52,6 @@ export class UploadUseCase {
 
       // Salvar a medida no banco de dados
       await this.measureRepository.create(measure);
-      console.log("Use Case: Medida criada com sucesso");
 
       return {
         image_url: geminiResponse.imageUrl,

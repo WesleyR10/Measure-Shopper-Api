@@ -36,8 +36,6 @@ describe('Upload Measure Controller E2E', () => {
         measure_type: 'WATER',
       });
 
-      console.log("response Test successfully", response.body);	
-
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       image_url: expect.any(String),

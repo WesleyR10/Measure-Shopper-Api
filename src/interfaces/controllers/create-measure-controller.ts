@@ -32,7 +32,6 @@ export const uploadController = (measureRepository: IMeasureRepository, geminiAp
         measure_type,
       });
 
-      console.log("Controller: Upload realizado com sucesso:", result);
       return reply.status(200).send(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
