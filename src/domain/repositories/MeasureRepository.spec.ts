@@ -104,10 +104,10 @@ describe('MeasureRepository', () => {
     };
   
     const measure = new Measure(updateData, new UniqueEntityID('id'));
-    await repository.update('id', measure);
+    await repository.update('measure_uuid', measure);
   
     expect(prisma.measure.update).toHaveBeenCalledWith({
-      where: { id: 'id' },
+      where: { measure_uuid: 'measure_uuid' },
       data: {
         measure_uuid: 'new-uuid',
         customer_code: 'new-code',

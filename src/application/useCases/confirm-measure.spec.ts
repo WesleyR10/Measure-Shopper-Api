@@ -22,7 +22,7 @@ describe('ConfirmMeasureUseCase', () => {
       confirmed_value: 150
     };
 
-    measureRepository.findById.mockResolvedValue(null);
+    measureRepository.findByMeasureId.mockResolvedValue(null);
 
     await expect(confirmMeasureUseCase.execute(request)).rejects.toEqual({
       statusCode: 404,
@@ -37,7 +37,7 @@ describe('ConfirmMeasureUseCase', () => {
       confirmed_value: 150
     };
 
-    measureRepository.findById.mockResolvedValue(new Measure({
+    measureRepository.findByMeasureId.mockResolvedValue(new Measure({
       customer_code: '12345',
       measure_datetime: new Date('2024-08-29T00:00:00Z'),
       measure_type: 'WATER',
@@ -70,7 +70,7 @@ describe('ConfirmMeasureUseCase', () => {
       measure_uuid: 'existing-uuid'
     });
 
-    measureRepository.findById.mockResolvedValue(measure);
+    measureRepository.findByMeasureId.mockResolvedValue(measure);
 
     const result = await confirmMeasureUseCase.execute(request);
 

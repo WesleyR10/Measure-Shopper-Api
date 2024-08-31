@@ -6,7 +6,7 @@ const fakeMeasureProps: MeasureProps = {
   customer_code: "customer_code",
   measure_datetime: new Date(),
   measure_type: "type",
-  image_url: "http://example.com/image.jpg",
+  image_url: "http://example.com/image.png",
   measure_value: 10,
   has_confirmed: true,
   measure_uuid: '88d8ad12-1f18-4328-86ab-9273d435e422' // UUID fixo para consistência

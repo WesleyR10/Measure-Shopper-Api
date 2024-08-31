@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyInstance } from 'fastify';
 import supertest from 'supertest';
-import { createServer } from '../src/server'; 
+import { createServer } from '../src/infrastructure/server/createServer'; 
 import { randomUUID } from 'node:crypto'
 
 let server: FastifyInstance;
@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.measure.deleteMany({});
+  await prisma.measure.deleteMany()
   await prisma.$disconnect();
   await server.close();
 });
@@ -32,7 +32,7 @@ describe('Confirm Measure Controller E2E', () => {
         measure_datetime: new Date(),
         measure_type: 'WATER',
         has_confirmed: false,
-        image_url: 'http://example.com/image.jpg',
+        image_url: 'http://example.com/image.png',
       },
     });
     

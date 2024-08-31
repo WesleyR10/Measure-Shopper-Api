@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const envSchema = z.object({
-  port: z.coerce.number().optional().default(3000),
+  PORT: z.coerce.number().optional().default(3000),
   SONAR_TOKEN: z.string().nonempty({ message: "SONAR_TOKEN é obrigatório" }),
   DOCKERHUB_TOKEN: z.string().nonempty({ message: "DOCKERHUB_TOKEN é obrigatório" }),
   DATABASE_URL: z.string().url({ message: "DATABASE_URL inválida" }),
@@ -9,7 +9,7 @@ export const envSchema = z.object({
 });
 
 const mappedEnv = {
-  port: process.env.PORT,
+  PORT: process.env.PORT,
   SONAR_TOKEN: process.env.SONAR_TOKEN,
   DOCKERHUB_TOKEN: process.env.DOCKERHUB_TOKEN,
   DATABASE_URL: process.env.DATABASE_URL,

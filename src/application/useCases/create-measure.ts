@@ -1,34 +1,36 @@
 import { Measure } from '../../domain/entities/measure';
 import { IMeasureRepository } from '../../domain/repositories/contract/IMeasureRepository';
-import axios from 'axios';
+import { GeminiApi } from '../../infrastructure/services/geminiApi';
 
 interface UploadRequest {
   image: string;
   customer_code: string;
   measure_datetime: Date;
-  measure_type: string;
-}
-
-interface GeminiApiResponse {
-  image: string;
-  measure_value: number;
-  measure_uuid: string;
+  measure_type: 'WATER' | 'GAS';
 }
 
 export class UploadUseCase {
-  constructor(private measureRepository: IMeasureRepository) {}
+  constructor(
+    private measureRepository: IMeasureRepository,
+    private geminiApi: GeminiApi
+  ) {}
 
   async execute(request: UploadRequest) {
     const { image, customer_code, measure_datetime, measure_type } = request;
 
     // Verificar se já existe uma leitura no mês
     const existingMeasures = await this.measureRepository.findByCustomerCodeAndType(customer_code, measure_type);
-    const existingMeasure = existingMeasures.find(measure => 
-      measure.measure_datetime.getMonth() === measure_datetime.getMonth() &&
-      measure.measure_datetime.getFullYear() === measure_datetime.getFullYear()
-    );
+    console.log("Use Case: Medidas existentes encontradas:", existingMeasures);
+    
+    const existingMeasure = existingMeasures.find(measure => {
+      const measureDate = new Date(measure.measure_datetime);
+      console.log(`Comparando datas: ${measureDate} e ${measure_datetime}`);
+      return measureDate.getMonth() === measure_datetime.getMonth() &&
+             measureDate.getFullYear() === measure_datetime.getFullYear();
+    });
 
     if (existingMeasure) {
+      console.log("Use Case: Leitura do mês já realizada");
       throw {
         statusCode: 409,
         code: 'DOUBLE_REPORT',
@@ -36,42 +38,33 @@ export class UploadUseCase {
       };
     }
 
-    // Integrar com a API do Google Gemini
-    const geminiResponse = await this.integrateWithGeminiApi(image);
-
-    // Criar a entidade Measure
-    const measure = new Measure({
-      customer_code,
-      measure_datetime,
-      measure_type,
-      image_url: geminiResponse.image,
-      measure_value: geminiResponse.measure_value,
-      has_confirmed: false,
-      measure_uuid: geminiResponse.measure_uuid
-    });
-
-    // Salvar a medida no banco de dados
-    await this.measureRepository.create(measure);
-
-    return {
-      image_url: geminiResponse.image,
-      measure_value: geminiResponse.measure_value,
-      measure_uuid: geminiResponse.measure_uuid
-    };
-  }
-
-  private async integrateWithGeminiApi(image: string): Promise<GeminiApiResponse> {
     try {
-      const response = await axios.post('https://ai.google.dev/gemini-api/vision', {
-        image
-      }, {
-        headers: {
-          'Authorization': `Bearer ${process.env.GEMINI_API_KEY}`
-        }
+      // Integrar com a API do Google Gemini
+      const geminiResponse = await this.geminiApi.analyzeImage(image, measure_type);
+      console.log("Use Case: Resposta da API Gemini:", geminiResponse);
+
+      // Criar a entidade Measure
+      const measure = new Measure({
+        customer_code,
+        measure_datetime,
+        measure_type,
+        image_url: geminiResponse.imageUrl,
+        measure_value: geminiResponse.measureValue,
+        has_confirmed: false,
+        measure_uuid: geminiResponse.measureUuid
       });
 
-      return response.data;
+      // Salvar a medida no banco de dados
+      await this.measureRepository.create(measure);
+      console.log("Use Case: Medida criada com sucesso");
+
+      return {
+        image_url: geminiResponse.imageUrl,
+        measure_value: geminiResponse.measureValue,
+        measure_uuid: geminiResponse.measureUuid
+      };
     } catch (error) {
+      console.error("Use Case: Erro ao processar a imagem:", error);
       throw {
         statusCode: 500,
         code: 'INTERNAL_ERROR',

@@ -3,14 +3,11 @@ import MockDate from 'mockdate';
 import { IMeasureRepository } from '../../domain/repositories/contract/IMeasureRepository';
 import { Measure } from '../../domain/entities/measure';
 import { UploadUseCase } from './create-measure';
-import axios from 'axios';
-
-// Simula a resposta da API do Google Gemini
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+import { GeminiApi } from '../../infrastructure/services/geminiApi';
 
 describe('UploadUseCase', () => {
   let measureRepository: MockProxy<IMeasureRepository>;
+  let geminiApi: MockProxy<GeminiApi>;
   let uploadUseCase: UploadUseCase;
 
   beforeAll(() => {
@@ -23,7 +20,8 @@ describe('UploadUseCase', () => {
 
   beforeEach(() => {
     measureRepository = mock<IMeasureRepository>();
-    uploadUseCase = new UploadUseCase(measureRepository);
+    geminiApi = mock<GeminiApi>();
+    uploadUseCase = new UploadUseCase(measureRepository, geminiApi);
   });
 
   afterEach(() => {
@@ -32,10 +30,10 @@ describe('UploadUseCase', () => {
 
   it('should throw an error if a measure already exists for the same month', async () => {
     const request = {
-      image: 'image-data',
+      image: 'image-data.png',
       customer_code: '12345',
       measure_datetime: new Date('2024-08-29T00:00:00Z'),
-      measure_type: 'WATER'
+      measure_type: "WATER" as "WATER" | "GAS"
     };
 
     measureRepository.findByCustomerCodeAndType.mockResolvedValue([
@@ -62,18 +60,16 @@ describe('UploadUseCase', () => {
       image: 'image-data',
       customer_code: '12345',
       measure_datetime: new Date('2024-08-29T00:00:00Z'),
-      measure_type: 'WATER'
-    };
+      measure_type: "WATER" as "WATER" | "GAS"
+      };
 
     measureRepository.findByCustomerCodeAndType.mockResolvedValue([]);
 
     // Simula a chamada à API do Google Gemini
-    mockedAxios.post.mockResolvedValue({
-      data: {
-        image: 'http://example.com/image.png',
-        measure_value: 100,
-        measure_uuid: 'uuid'
-      }
+    geminiApi.analyzeImage.mockResolvedValue({
+      imageUrl: 'http://example.com/image.png',
+      measureValue: 100,
+      measureUuid: 'uuid'
     });
 
     const result = await uploadUseCase.execute(request);
@@ -86,20 +82,19 @@ describe('UploadUseCase', () => {
 
     expect(measureRepository.create).toHaveBeenCalledWith(expect.any(Measure));
   });
-
   it('should throw an error if Google Gemini API fails', async () => {
     const request = {
       image: 'image-data',
       customer_code: '12345',
       measure_datetime: new Date('2024-08-29T00:00:00Z'),
-      measure_type: 'WATER'
+      measure_type: "WATER" as "WATER" | "GAS"
     };
-
+  
     measureRepository.findByCustomerCodeAndType.mockResolvedValue([]);
-
+  
     // Simula uma falha na chamada à API do Google Gemini
-    mockedAxios.post.mockRejectedValue(new Error('API Error'));
-
+    geminiApi.analyzeImage.mockRejectedValue(new Error('API Error'));
+  
     await expect(uploadUseCase.execute(request)).rejects.toEqual({
       statusCode: 500,
       code: 'INTERNAL_ERROR',

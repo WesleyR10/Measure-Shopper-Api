@@ -2,6 +2,7 @@ import { UploadUseCase } from '@/application/useCases/create-measure';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { IMeasureRepository } from '@/domain/repositories/contract/IMeasureRepository';
+import { GeminiApi } from '@/infrastructure/services/geminiApi';
 
 const uploadBodySchema = z.object({
   image: z.string().base64("Invalid base64 format"),
@@ -9,14 +10,12 @@ const uploadBodySchema = z.object({
   measure_datetime: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Invalid date format",
   }),
-  measure_type: z.enum(["WATER", "GAS"], {
-    errorMap: () => ({ message: "Measure type must be 'WATER' or 'GAS'" }),
-  }),
+  measure_type: z.union([z.literal("WATER"), z.literal("GAS")]) ,
 });
 
 type UploadBodySchema = z.infer<typeof uploadBodySchema>;
 
-export const uploadController = (measureRepository: IMeasureRepository) => {
+export const uploadController = (measureRepository: IMeasureRepository, geminiApi: GeminiApi) => {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       // Validar os parâmetros da requisição
@@ -24,7 +23,7 @@ export const uploadController = (measureRepository: IMeasureRepository) => {
 
       const { image, customer_code, measure_datetime, measure_type } = validatedData;
 
-      const uploadUseCase = new UploadUseCase(measureRepository);
+      const uploadUseCase = new UploadUseCase(measureRepository, geminiApi);
 
       const result = await uploadUseCase.execute({
         image,
@@ -33,6 +32,7 @@ export const uploadController = (measureRepository: IMeasureRepository) => {
         measure_type,
       });
 
+      console.log("Controller: Upload realizado com sucesso:", result);
       return reply.status(200).send(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
