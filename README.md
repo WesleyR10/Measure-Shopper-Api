@@ -15,31 +15,36 @@ Para iniciar o projeto, siga os passos abaixo:
 1. Clone o repositório:
 
    ```sh
-   git clone <URL_DO_REPOSITORIO>
+   git clone https://github.com/WesleyR10/Measure-Shopper-Api.git
    cd shopper-backend
-
    ```
 
-2. Instale as dependências:
+2. Inicie o docker:
+
+   ```sh
+   docker-compose up -d
+   ```
+
+3. Instale as dependências:
 
 ````sh
 npm install
 ```
-3. Inicie o servidor em modo de desenvolvimento caso queira testar em modo local:
+4. Inicie o servidor em modo de desenvolvimento caso queira testar em modo local:
 
-```sh
+````sh
 npm run start:dev
 ```
 
-4. Para construir o projeto:
+5. Para construir o projeto:
 
-```sh
+````sh
 npm run build
 ```
 
-5. Para iniciar o servidor em produção:d
+6. Para iniciar o servidor em produção:d
 
-```sh
+````sh
 npm start
 ```
 
